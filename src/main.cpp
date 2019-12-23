@@ -10,35 +10,52 @@
 #include <Wire.h>
 #include <imu.h>
 #include <pid.h>
-#include <motor.h>
-// #include <AccelStepper.h>
-// #include "avdweb_SAMDtimer.h"
+#include <stepper.h>
+
+#define PIN_ENABLE 4 
+#define PIN_M0 5
+#define PIN_M1 6
+#define PIN_M2 7
+#define PIN_RESET 8
+#define PIN_SLEEP 9
+#define PIN_STEP 10
+#define PIN_DIR 11
 
 float kp = 0.5, ki = 0.0, kd = 0.0;
 
 Sample sample;
 Imu imu(sample);
 PID pid(kp, ki, kd);
-Motor motor(1);
-
-// AccelStepper stepper1(AccelStepper::FULL2WIRE, PIN_STEP, PIN_DIR);
+Stepper stepper1(10, 11);
   
 volatile int count=0;
 
 float speed = 0.0;
 
-// void ISR_timer3_LED1()
-// { static bool b;
-//   pinMode(13, OUTPUT);
-//   digitalWrite(13, b=!b);
-// }
-
-
 void setup() {
+
+  pinMode(PIN_ENABLE, OUTPUT);
+  pinMode(PIN_M0, OUTPUT);
+  pinMode(PIN_M1, OUTPUT);
+  pinMode(PIN_M2, OUTPUT);
+  pinMode(PIN_RESET, OUTPUT);
+  pinMode(PIN_SLEEP, OUTPUT);
+  pinMode(PIN_DIR, OUTPUT);
+  pinMode(PIN_STEP, OUTPUT);
+  pinMode(PIN_LED, OUTPUT);
+
+  digitalWrite(PIN_ENABLE, LOW);
+  digitalWrite(PIN_M0, LOW);
+  digitalWrite(PIN_M1, LOW);
+  digitalWrite(PIN_M2, LOW);
+  digitalWrite(PIN_RESET, HIGH);
+  digitalWrite(PIN_SLEEP, HIGH);
+  digitalWrite(PIN_DIR, LOW);
+  digitalWrite(PIN_STEP, LOW);
 
 
   Serial.begin(1000000);
-  while (!Serial);
+  // while (!Serial);
 
   
   if (!IMU.begin()) {
@@ -47,8 +64,8 @@ void setup() {
   }
 
   imu.calibrate(250, 250);
-  motor.begin();
-  motor.setMicrosteps(4);
+  stepper1.begin();
+  stepper1.setMicrosteps(1, PIN_M0, PIN_M1, PIN_M2);
   // motor.setFrequency(1);
 
 }
@@ -58,11 +75,9 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
 
+  static bool b;
+
   static int16_t count = 0;
-
-  // stepper1.
-
-  // Serial.println(sample.axesGyro.roll);
 
   if (imu.read()) {
     imu.doCalculations();
@@ -71,15 +86,17 @@ void loop() {
     count++;
     speed = pid.calculate(sample.axes.roll, 0.0);
       
-    if(count%10 == 0) {
+    if(count%100 == 0) {
       Serial.print(sample.axes.roll);
       Serial.print(" : ");
-      Serial.println((int) speed);
-    
+      Serial.print((int) speed);
+      Serial.print(" : ");
+      Serial.println(b);
+      
+      digitalWrite(PIN_LED, b = !b);
+
     }
-    motor.setFrequency((int) speed);
+    stepper1.setFrequency((int) speed);
     
-    // 
-    // Serial.print(sample.axesAccel.roll);
   }
 }
