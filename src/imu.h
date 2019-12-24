@@ -19,6 +19,8 @@ struct Sample {
   Axes axesGyro; // units degrees (expect major drift)
   Axes axesGyroCalibrated; // units degrees (expect minor drift)
   Axes axes; // units degrees (excellent roll, pitch, yaw minor drift)
+  long interval;
+  float frequency;
 
 };
 
@@ -30,6 +32,7 @@ class Imu
     // Sample read();
     boolean read();
     void doCalculations();
+    void printCalculations();
   private:
     int _pin;
     Sample *_sample;

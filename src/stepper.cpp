@@ -80,7 +80,7 @@ void Stepper::begin()
 
 }
 
-void Stepper::setFrequency(int frequency) 
+int Stepper::setFrequency(float frequency) 
 {
     if (frequency == 0) frequency = 1;
     if (frequency < 0 ) {
@@ -90,6 +90,7 @@ void Stepper::setFrequency(int frequency)
     }
 
     int period = 4799 / abs(frequency);
+    if (period > 9599) period = 9599;
     int halfPeriod = period / 2;
 
     TCC0->PERB.reg = period;                           // Set the frequency to 10kHz
@@ -100,7 +101,7 @@ void Stepper::setFrequency(int frequency)
     while (TCC0->SYNCBUSY.bit.CCB3);                 // Wait for synchronization
 
     digitalWrite(_dirPin, _dir);
-
+    return period;
     // MyTimer5.changeFrequency(abs(frequency) * 2);
 
 }

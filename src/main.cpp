@@ -55,7 +55,7 @@ void setup() {
 
 
   Serial.begin(1000000);
-  // while (!Serial);
+  while (!Serial);
 
   
   if (!IMU.begin()) {
@@ -65,7 +65,7 @@ void setup() {
 
   imu.calibrate(250, 250);
   stepper1.begin();
-  stepper1.setMicrosteps(1, PIN_M0, PIN_M1, PIN_M2);
+  stepper1.setMicrosteps(4, PIN_M0, PIN_M1, PIN_M2);
   // motor.setFrequency(1);
 
 }
@@ -85,18 +85,27 @@ void loop() {
     // Serial.print(" : ");
     count++;
     speed = pid.calculate(sample.axes.roll, 0.0);
+    int period = stepper1.setFrequency(speed);
       
+    if(count%10 == 0) {
+      imu.printCalculations();
+      // Serial.print(sample.axes.roll);
+      // Serial.print(",");
+      // Serial.print(sample.axesAccel.roll);
+      // Serial.print(",");
+      // Serial.print(sample.axesGyro.roll);
+      // Serial.print(",");
+      // Serial.print(sample.interval);
+      // Serial.print(" : ");
+      // Serial.print(speed);
+      // Serial.print(" : ");
+      // Serial.print(period);
+      Serial.println("");
     if(count%100 == 0) {
-      Serial.print(sample.axes.roll);
-      Serial.print(" : ");
-      Serial.print((int) speed);
-      Serial.print(" : ");
-      Serial.println(b);
       
       digitalWrite(PIN_LED, b = !b);
-
     }
-    stepper1.setFrequency((int) speed);
+    }
     
   }
 }

@@ -18,7 +18,7 @@ class Stepper
     Stepper(int stepPin, int dirPin);
     void setMicrosteps(uint16_t microstep, int m0Pin, int m1Pin, int m2Pin);
     void begin();
-    void setFrequency(int frequency);
+    int setFrequency(float frequency);
   private:
     float _frequency;
     int _dir;
