@@ -32,7 +32,7 @@ volatile int count=0;
 
 float speed = 0.0;
 
-void setup() {
+void setup1() {
 
   pinMode(PIN_ENABLE, OUTPUT);
   pinMode(PIN_M0, OUTPUT);
@@ -73,7 +73,7 @@ void setup() {
 
 
 // the loop function runs over and over again forever
-void loop() {
+void loop1() {
 
   static bool b;
 
